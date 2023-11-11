@@ -48,8 +48,21 @@ local function live_grep_git_root()
   end
 end
 
+local function live_git_root()
+  local git_root = find_git_root()
+  local isgit = vim.fn.systemlist("git rev-parse --is-inside-work-tree")[1]
+  print(isgit)
+  if isgit == "true" then
+    return require('telescope.builtin').git_files({})
+  else
+    return require('telescope.builtin').find_files({hidden = false})
+  end
+end
+
+
 vim.api.nvim_create_user_command('LiveGrepGitRoot', live_grep_git_root, {})
 
+vim.api.nvim_create_user_command('LiveGitRoot', live_git_root, {})
 -- See `:help telescope.builtin`
 vim.keymap.set('n', '<leader>?', require('telescope.builtin').oldfiles, { desc = '[?] Find recently opened files' })
 vim.keymap.set('n', '<leader>fb', require('telescope.builtin').buffers, { desc = '[F]ind existing [b]uffers' })
@@ -61,7 +74,7 @@ vim.keymap.set('n', '<leader>/', function()
   })
 end, { desc = '[/] Fuzzily search in current buffer' })
 
-vim.keymap.set('n', '<leader><space>', require('telescope.builtin').git_files, { desc = 'Search [G]it [F]iles' })
+vim.keymap.set('n', '<leader><space>', ':LiveGitRoot<cr>', { desc = 'Search [G]it [F]iles' })
 vim.keymap.set('n', '<leader>sf', require('telescope.builtin').find_files, { desc = '[S]earch [F]iles' })
 vim.keymap.set('n', '<leader>sh', require('telescope.builtin').help_tags, { desc = '[S]earch [H]elp' })
 vim.keymap.set('n', '<leader>sw', require('telescope.builtin').grep_string, { desc = '[S]earch current [W]ord' })
